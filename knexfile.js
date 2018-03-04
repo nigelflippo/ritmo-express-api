@@ -5,9 +5,9 @@ module.exports = {
     client: 'pg',
     connection: 'postgres://localhost/ritmo_db_dev',
     migrations: {
-      diredctory: './db/migrations'
+      directory: './db/migrations'
     },
-    seed: {
+    seeds: {
       directory: './db/seeds'
     }
   },
@@ -15,7 +15,7 @@ module.exports = {
     client: 'pg',
     connection: process.env.DATABASE_URL,
     migrations: {
-      diredctory: './db/migrations'
+      directory: './db/migrations'
     },
     seeds: {
       directory: './db/seeds'
