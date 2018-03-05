@@ -216,8 +216,9 @@ const generateToken = (data, res) => {
     expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
     secure: router.get('env') === 'production'
   })
-  // delete user.password
+  delete user.password
 }
+
 _.createUser = async (req, res, next) => {
 
   const {
