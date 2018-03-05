@@ -11,7 +11,6 @@ const _ = {}
 _.getAllUsers = (req, res, next) => {
   return knex('users').orderBy('last_name', 'desc')
     .then(data => {
-
       res.status(200).json(data)
     })
     .catch(err => next(err))
@@ -19,20 +18,23 @@ _.getAllUsers = (req, res, next) => {
 
 _.getUser = (req, res, next) => {
   const id = req.params.id
-  if (Number.isNaN(id)) return next({ status: 404, message: `Not Found` })
-
+  if (Number.isNaN(id)) {
+    return next({ status: 404, message: `Not Found` })
+  }
   return knex('users')
     .where({ id })
     .first()
     .then(data => {
-      if (!data) return next({ status: 404, message: `Not Found` })
-
+      if (!data) {
+        return next({ status: 404, message: `Not Found` })
+      }
       res.status(200).json(data)
     })
     .catch(err => next(err))
 }
 
 _.createUser = (req, res, next) => {
+
   const {
     first_name,
     last_name,
@@ -46,10 +48,12 @@ _.createUser = (req, res, next) => {
   } = req.body
 
   const re = /^[A-Za-z\d$@$!%*#?&]{8,}$/
-  if (!re.test(password)) return next({ status: 400, message: `Password` })
-
-  if (!email) return next({ status: 400, message: `Email must not be blank` })
-
+  if (!re.test(password)) {
+    return next({ status: 400, message: `Password` })
+  }
+  if (!email) {
+    return next({ status: 400, message: `Email must not be blank` })
+  }
   return knex('users')
     .where({ email })
     .first()
@@ -59,8 +63,9 @@ _.createUser = (req, res, next) => {
       }
     })
     .then(password => {
-      if (!password) return next({ status: 400, message: `User account already exists` })
-
+      if (!password) {
+        return next({ status: 400, message: `User account already exists` })
+      }
       const newUser = {
         first_name,
         last_name,
@@ -72,12 +77,13 @@ _.createUser = (req, res, next) => {
         skill_level_id,
         instrument_id
       }
-
       return knex.insert(newUser, '*')
         .into('users')
     })
     .then(data => {
-      if (!data) return next({ status: 400, message: `User account already exists` })
+      if (!data) {
+        return next({ status: 400, message: `User account already exists` })
+      }
 
       const user = data[0]
       const claim = { user_id: user.id }
@@ -99,14 +105,16 @@ _.createUser = (req, res, next) => {
 
 _.updateUser = (req, res, next) => {
   const id = req.params.id
-  if (Number.isNaN(id)) return next({ status: 404, message: `Not Found` })
-
+  if (Number.isNaN(id)) {
+    return next({ status: 404, message: `Not Found` })
+  }
   return knex('users')
     .where({ id })
     .first()
     .then(user => {
-      if (!user) return next({ status: 404, message : `User Not Found`})
-
+      if (!user) {
+        return next({ status: 404, message : `User Not Found`})
+      }
       const {
         username,
         phone_number,
@@ -114,7 +122,6 @@ _.updateUser = (req, res, next) => {
         skill_level_id,
         instrument_id
       } = req.body
-
       const patchUser = {
         username,
         phone_number,
@@ -135,8 +142,9 @@ _.updateUser = (req, res, next) => {
 
 _.deleteUser = (req, res, next) => {
   const id = parseInt(req.params.id)
-  if (Number.isNaN(id)) return next({ status: 404, message: `Not Found` })
-
+  if (Number.isNaN(id)) {
+    return next({ status: 404, message: `Not Found` })
+  }
   return knex('users')
     .where({ id })
     .first()

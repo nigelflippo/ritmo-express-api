@@ -8,7 +8,13 @@ const skillLevels = require('./skill_levels')
 const instruments = require('./instruments')
 const users = require('./users')
 
-const authorize = () => {}
+const authorize = (req, res, next) => {
+  jwt.verify(req.cookies.token, process.env.JWT_KEY, (err, payload) => {
+    if (err) return next({ status: 401, message: `Unauthorized` })
+    req.claim = payload
+    next()
+  })
+}
 
 router.get('/skill_levels', skillLevels.getAllSkillLevels)
 router.get('/skill_levels/:id', skillLevels.getSkillLevel)
