@@ -193,18 +193,13 @@ _.getUser = async (req, res, next) => {
 
 const validate = (password, email) => {
   const re = /^[A-Za-z\d$@$!%*#?&]{8,}$/
-  if (!re.test(password)) {
-    return next({ status: 400, message: `Password` })
-  }
-  if (!email) {
-    return next({ status: 400, message: `Email must not be blank` })
-  }
+  if (!re.test(password)) return next({ status: 400, message: `Password` })
+  if (!email) return next({ status: 400, message: `Email must not be blank` })
 }
 
 const generateToken = (data, res) => {
-  if (!data) {
-    return next({ status: 400, message: `User account already exists` })
-  }
+  if (!data) return next({ status: 400, message: `User account already exists` })
+
   const user = data[0]
   const claim = { user_id: user.id }
   const token = jwt.sign(claim, process.env.JWT_KEY, {
@@ -245,6 +240,7 @@ _.createUser = async (req, res, next) => {
   if (!hashedPassword) {
     return next({ status: 400, message: `User account already exists` })
   }
+
   const newUser = {
     first_name,
     last_name,
@@ -256,6 +252,7 @@ _.createUser = async (req, res, next) => {
     skill_level_id,
     instrument_id
   }
+
   const data = await knex.insert(newUser, '*')
     .into('users')
     .catch(err => next(err))
@@ -265,7 +262,7 @@ _.createUser = async (req, res, next) => {
   res.status(201).json({'New User': data[0]})
 }
 
-//
+//PATCH USER
 _.updateUser = (req, res, next) => {
   const id = req.params.id
   if (Number.isNaN(id)) {
