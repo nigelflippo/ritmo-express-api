@@ -8,8 +8,8 @@ const router = express.Router()
 
 const _ = {}
 
-_.getAllUsers = async(req, res, next) => {
-  const data = await knex('users')
+_.getAllUsers = (req, res, next) => {
+  return knex('users')
     .orderBy('last_name', 'desc')
     .then(data => {
       res.status(200).json(data)
