@@ -123,7 +123,101 @@ _.getUser = async (req, res, next) => {
 //     })
 //     .catch(err => next(err))
 // }
-//ASYNC AWAIT POST
+
+// //OLD ASYNC
+// _.createUser = async (req, res, next) => {
+//
+//   const {
+//     first_name,
+//     last_name,
+//     username,
+//     email,
+//     phone_number,
+//     address,
+//     password,
+//     skill_level_id,
+//     instrument_id
+//   } = req.body
+//
+//   const re = /^[A-Za-z\d$@$!%*#?&]{8,}$/
+//   if (!re.test(password)) {
+//     return next({ status: 400, message: `Password` })
+//   }
+//   if (!email) {
+//     return next({ status: 400, message: `Email must not be blank` })
+//   }
+//   let hashedPassword
+//   const userCheck = await knex('users')
+//     .where({ email })
+//     .first()
+//   if (!userCheck) {
+//     hashedPassword = await bcrypt.hash(password, 10)
+//   }
+//   if (!hashedPassword) {
+//     return next({ status: 400, message: `User account already exists` })
+//   }
+//   const newUser = {
+//     first_name,
+//     last_name,
+//     username,
+//     email,
+//     phone_number,
+//     address,
+//     password: hashedPassword,
+//     skill_level_id,
+//     instrument_id
+//   }
+//   const data = await knex.insert(newUser, '*')
+//     .into('users')
+//     .catch(err => next(err))
+//   if (!data) {
+//     return next({ status: 400, message: `User account already exists` })
+//   }
+//   const user = data[0]
+//   const claim = { user_id: user.id }
+//   const token = jwt.sign(claim, process.env.JWT_KEY, {
+//     expiresIn: '1 day'
+//   })
+//
+//   res.cookie('token', token, {
+//     httpOnly: true,
+//     expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+//     secure: router.get('env') === 'production'
+//   })
+//
+//   delete user.password
+//   res.status(201).json(user)
+// }
+
+//WORKING ASYNC
+
+const validate = (password, email) => {
+  const re = /^[A-Za-z\d$@$!%*#?&]{8,}$/
+  if (!re.test(password)) {
+    return next({ status: 400, message: `Password` })
+  }
+  if (!email) {
+    return next({ status: 400, message: `Email must not be blank` })
+  }
+}
+
+const generateToken = (data, res) => {
+  if (!data) {
+    return next({ status: 400, message: `User account already exists` })
+  }
+  const user = data[0]
+  const claim = { user_id: user.id }
+  const token = jwt.sign(claim, process.env.JWT_KEY, {
+    expiresIn: '1 day'
+  })
+
+  res.cookie('token', token, {
+    httpOnly: true,
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+    secure: router.get('env') === 'production'
+  })
+  // delete user.password
+}
 _.createUser = async (req, res, next) => {
 
   const {
@@ -138,13 +232,8 @@ _.createUser = async (req, res, next) => {
     instrument_id
   } = req.body
 
-  const re = /^[A-Za-z\d$@$!%*#?&]{8,}$/
-  if (!re.test(password)) {
-    return next({ status: 400, message: `Password` })
-  }
-  if (!email) {
-    return next({ status: 400, message: `Email must not be blank` })
-  }
+  validate(password, email)
+
   let hashedPassword
   const userCheck = await knex('users')
     .where({ email })
@@ -169,24 +258,12 @@ _.createUser = async (req, res, next) => {
   const data = await knex.insert(newUser, '*')
     .into('users')
     .catch(err => next(err))
-  if (!data) {
-    return next({ status: 400, message: `User account already exists` })
-  }
-  const user = data[0]
-  const claim = { user_id: user.id }
-  const token = jwt.sign(claim, process.env.JWT_KEY, {
-    expiresIn: '1 day'
-  })
 
-  res.cookie('token', token, {
-    httpOnly: true,
-    expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
-    secure: router.get('env') === 'production'
-  })
+  const token = generateToken(data, res)
 
-  delete user.password
-  res.status(201).json(user)
+  res.status(201).json({'New User': data[0]})
 }
+
 //
 _.updateUser = (req, res, next) => {
   const id = req.params.id
