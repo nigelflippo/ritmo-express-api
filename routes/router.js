@@ -20,6 +20,8 @@ router.post('/instruments', instruments.createInstrument)
 router.get('/users', users.getAllUsers)
 router.get('/users/:id', users.getUser)
 router.post('/users', users.createUser)
+router.patch('/users/:id', users.updateUser)
+router.delete('/users/:id', users.deleteUser)
 
 
 module.exports = router

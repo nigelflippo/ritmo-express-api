@@ -59,10 +59,8 @@ _.createUser = (req, res, next) => {
       }
     })
     .then(password => {
-      if (!password) {
-        return next({ status: 400, message: `User account already exists` })
+      if (!password) return next({ status: 400, message: `User account already exists` })
 
-      }
       const newUser = {
         first_name,
         last_name,
@@ -95,6 +93,56 @@ _.createUser = (req, res, next) => {
 
       delete user.password
       res.status(201).json(user)
+    })
+    .catch(err => next(err))
+}
+
+_.updateUser = (req, res, next) => {
+  const id = req.params.id
+  if (Number.isNaN(id)) return next({ status: 404, message: `Not Found` })
+
+  return knex('users')
+    .where({ id })
+    .first()
+    .then(user => {
+      if (!user) return next({ status: 404, message : `User Not Found`})
+
+      const {
+        username,
+        phone_number,
+        address,
+        skill_level_id,
+        instrument_id
+      } = req.body
+
+      const patchUser = {
+        username,
+        phone_number,
+        address,
+        skill_level_id,
+        instrument_id
+      }
+
+      return knex('users')
+        .update(patchUser, '*')
+        .where({ id })
+    })
+    .then(data => {
+      res.status(200).json(data)
+    })
+    .catch(err => next(err))
+}
+
+_.deleteUser = (req, res, next) => {
+  const id = parseInt(req.params.id)
+  if (Number.isNaN(id)) return next({ status: 404, message: `Not Found` })
+
+  return knex('users')
+    .where({ id })
+    .first()
+    .del()
+    .then(data => {
+      res.status(204).json(data)
     })
     .catch(err => next(err))
 }
