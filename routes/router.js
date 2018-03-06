@@ -4,9 +4,10 @@ const express = require('express')
 const knex = require('../knex')
 const router = express.Router()
 
-const skillLevels = require('./skill_levels')
-const instruments = require('./instruments')
-const users = require('./users')
+const skillLevels = require('../queries/skill_levels')
+const instruments = require('../queries/instruments')
+const users = require('../queries/users')
+const auth = require('../queries/auth')
 
 const authorize = (req, res, next) => {
   jwt.verify(req.cookies.token, process.env.JWT_KEY, (err, payload) => {
@@ -28,6 +29,9 @@ router.get('/users/:id', users.getUser)
 router.post('/users', users.createUser)
 router.patch('/users/:id', users.updateUser)
 router.delete('/users/:id', users.deleteUser)
+
+router.get('/auth/verify', auth.verifyAuth)
+router.post('auth/login', auth.authLogin)
 
 
 module.exports = router
