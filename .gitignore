@@ -1,5 +1,4 @@
 node_modules/
 .DS_Store
 .env
-fetch.js
-password_hash.js
+drafting/
