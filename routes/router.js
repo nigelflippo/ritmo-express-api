@@ -8,6 +8,7 @@ const skillLevels = require('../queries/skill_levels')
 const instruments = require('../queries/instruments')
 const users = require('../queries/users')
 const auth = require('../queries/auth')
+const lessons = require('../queries/lessons')
 
 const authorize = (req, res, next) => {
   jwt.verify(req.cookies.token, process.env.JWT_KEY, (err, payload) => {
@@ -32,6 +33,8 @@ router.delete('/users/:id', users.deleteUser)
 
 router.get('/auth/verify', auth.verifyAuth)
 router.post('auth/login', auth.authLogin)
+
+router.get('/lessons', lessons.getAllLessons)
 
 
 module.exports = router

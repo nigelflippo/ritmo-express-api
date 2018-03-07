@@ -5,29 +5,32 @@ const knex = require('../knex')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const router = express.Router()
-
 const _ = {}
 
-
-_.getAllUsers = async (req, res, next) => {
-  const data = await knex('users')
+_.getAllUsers = (req, res, next) => {
+  knex('users')
     .orderBy('last_name', 'desc')
+    .then(data => {
+      res.status(200).json(data)
+    })
     .catch(err => next(err))
-
-  res.status(200).json(data)
 }
 
-_.getUser = async (req, res, next) => {
+_.getUser = (req, res, next) => {
   const id = req.params.id
-  if (Number.isNaN(id)) return next({ status: 404, message: `Not Found` })
-
-  const data = await knex('users')
-    .where({id})
+  if (Number.isNaN(id)) {
+    next({ status: 404, message: `Not Found` })
+  }
+  knex('users')
+    .where({ id })
     .first()
+    .then(data => {
+      if (!data) {
+        return next({ status: 404, message: `Not Found` })
+      }
+      res.status(200).json(data)
+    })
     .catch(err => next(err))
-  if (!data) return next({ status: 404, message: `Not Found` })
-
-  res.status(200).json(data)
 }
 
 _.createUser = (req, res, next) => {
@@ -51,7 +54,7 @@ _.createUser = (req, res, next) => {
   if (!email) {
     return next({ status: 400, message: `Email must not be blank` })
   }
-  return knex('users')
+  knex('users')
     .where({ email })
     .first()
     .then(user => {
@@ -74,7 +77,7 @@ _.createUser = (req, res, next) => {
         skill_level_id,
         instrument_id
       }
-      return knex.insert(newUser, '*')
+      knex.insert(newUser, '*')
         .into('users')
     })
     .then(data => {
@@ -106,7 +109,7 @@ _.updateUser = (req, res, next) => {
   if (Number.isNaN(id)) {
     return next({ status: 404, message: `Not Found` })
   }
-  return knex('users')
+  knex('users')
     .where({ id })
     .first()
     .then(user => {
@@ -128,7 +131,7 @@ _.updateUser = (req, res, next) => {
         instrument_id
       }
 
-      return knex('users')
+      knex('users')
         .update(patchUser, '*')
         .where({ id })
     })
@@ -143,7 +146,7 @@ _.deleteUser = (req, res, next) => {
   if (Number.isNaN(id)) {
     return next({ status: 404, message: `Not Found` })
   }
-  return knex('users')
+  knex('users')
     .where({ id })
     .first()
     .del()

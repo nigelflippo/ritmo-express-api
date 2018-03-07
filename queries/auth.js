@@ -45,5 +45,10 @@ _.authLogin = (req, res, next) => {
     })
 }
 
+_.authLogout = (req, res, next) => {
+  res.clearCookie('token')
+  res.end()
+}
+
 
 module.exports = _

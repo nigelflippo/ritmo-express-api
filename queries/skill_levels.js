@@ -2,7 +2,6 @@
 
 const express = require('express')
 const knex = require('../knex')
-
 const _ = {}
 
 _.getAllSkillLevels = (req, res, next) => {
