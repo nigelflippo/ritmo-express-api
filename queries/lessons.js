@@ -15,4 +15,5 @@ _.getLesson = (req, res, next) => {
   const id = req.params.id
   knex('lessons')
 }
+
 module.exports = _
